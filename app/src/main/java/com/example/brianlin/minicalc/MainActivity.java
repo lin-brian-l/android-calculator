@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.view.View;
 import android.widget.EditText;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
     public static final String FIRST_INTEGER = "com.example.firstapp.FIRSTINTEGER";
@@ -20,8 +22,15 @@ public class MainActivity extends AppCompatActivity {
     public void calculate(View view) {
         Intent intent = new Intent(this, CalculateActivity.class);
 
-        EditText firstIntegerText = (EditText) findViewById(R.id.editText2);
-        Integer firstInteger = Integer.parseInt(firstIntegerText.getText().toString());
+        EditText problemText = (EditText) findViewById(R.id.editText2);
+        String problem = problemText.getText().toString();
+
+        String numberRegex = "(-?\\d+)";
+        Pattern numberPattern = Pattern.compile(numberRegex);
+
+        Matcher matches = numberPattern.matcher(problem);
+
+
 
         EditText secondIntegerText = (EditText) findViewById(R.id.editText4);
         Integer secondInteger = Integer.parseInt(secondIntegerText.getText().toString());
