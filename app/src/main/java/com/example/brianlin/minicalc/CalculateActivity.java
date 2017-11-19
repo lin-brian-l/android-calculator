@@ -12,70 +12,72 @@ import java.util.regex.Pattern;
 
 public class CalculateActivity extends AppCompatActivity {
 
+    public static String condenseEquationList(List<String> equationList) {
+        String result = null;
+        while (equationList.size() > 1) {
+            result =  condenseEquation(equationList);
+            equationList.set(0, result);
+        }
+        return equationList.get(0);
+    }
+
+    public static List<String> regexSplitter(String stringToSplit, String desiredRegex) {
+        String regexString = null;
+        if (desiredRegex == "addSubtract") {
+            regexString = "([0-9*/]+|([+-]))";
+        } else if (desiredRegex == "multiplyDivide") {
+            regexString = "(-?\\d+)|(\\D)";
+        }
+        Pattern p = Pattern.compile(regexString);
+        Matcher m = p.matcher(stringToSplit);
+        List<String> equationList = new ArrayList<String>();
+        while (m.find()) {
+            equationList.add(m.group(0));
+        }
+        return equationList;
+    }
+
+    public static String condenseEquation(List<String> equations) {
+        Integer int1 = Integer.parseInt(equations.get(0));
+        Integer int2 = Integer.parseInt(equations.get(2));
+        equations.remove(2);
+        equations.remove(0);
+        String result = null;
+        String operator = equations.get(0);
+        switch(operator) {
+            case "*":
+                result = Integer.toString(int1 * int2);
+                break;
+            case "/":
+                result = Integer.toString(int1 / int2);
+                break;
+            case "+":
+                result = Integer.toString(int1 + int2);
+                break;
+            case "-":
+                result = Integer.toString(int1 - int2);
+                break;
+            default:
+                result = null;
+                break;
+        }
+        return result;
+    }
+
     public static String calculateAnswer(String problemLine) {
         String problemToSolve = problemLine.replaceAll("\\s", "");
-        String splitAddSubtract = "([0-9*/]+|([+-]))";
-        Pattern p = Pattern.compile(splitAddSubtract);
-        Matcher m = p.matcher(problemToSolve);
-        List<String> problemList = new ArrayList<String>();
-
-        while (m.find()) {
-            problemList.add(m.group(0));
-        }
+        List<String> problemList = regexSplitter(problemToSolve, "addSubtract");
 
         for(Integer i = 0; i < problemList.size(); i++) {
             List<String> equationMultiplyDivide = new ArrayList<String>();
             String equation = problemList.get(i);
 
             if (equation.contains("*") || equation.contains("/")) {
-                String splitMultiplyDivide = "(-?\\d+)|(\\D)";
-                Pattern p2 = Pattern.compile(splitMultiplyDivide);
-                Matcher m2 = p2.matcher(equation);
-
-                while (m2.find()) {
-                    equationMultiplyDivide.add(m2.group(0));
-                }
-
-                Integer intMultiplyDivide1 = null;
-                Integer intMultiplyDivide2 = null;
-                String resultMultiplyDivide = null;
-
-                while (equationMultiplyDivide.size() > 1) {
-                    intMultiplyDivide1 = Integer.parseInt(equationMultiplyDivide.get(0));
-                    intMultiplyDivide2 = Integer.parseInt(equationMultiplyDivide.get(2));
-                    equationMultiplyDivide.remove(2);
-                    equationMultiplyDivide.remove(0);
-
-                    if (equationMultiplyDivide.get(0).equals("*")) {
-                        resultMultiplyDivide = Integer.toString(intMultiplyDivide1 * intMultiplyDivide2);
-                    } else if (equationMultiplyDivide.get(0).equals("/")) {
-                        resultMultiplyDivide = Integer.toString(intMultiplyDivide1 / intMultiplyDivide2);
-                    }
-                    equationMultiplyDivide.set(0, resultMultiplyDivide);
-                }
-
-                problemList.set(i, resultMultiplyDivide);
+                equationMultiplyDivide = regexSplitter(equation, "multiplyDivide");
+                problemList.set(i, condenseEquationList(equationMultiplyDivide));
             }
         }
-
-        Integer intAddSubtract1 = null;
-        Integer intAddSubtract2 = null;
-        String resultAddSubtract = null;
-
-        while (problemList.size() > 1) {
-            intAddSubtract1 = Integer.parseInt(problemList.get(0));
-            intAddSubtract2 = Integer.parseInt(problemList.get(2));
-            problemList.remove(2);
-            problemList.remove(0);
-
-            if (problemList.get(0).equals("+")) {
-                resultAddSubtract = Integer.toString(intAddSubtract1 + intAddSubtract2);
-            } else if (problemList.get(0).equals("-")) {
-                resultAddSubtract = Integer.toString(intAddSubtract1 - intAddSubtract2);
-            }
-            problemList.set(0, resultAddSubtract);
-        }
-        return problemList.get(0);
+        return condenseEquationList(problemList);
     }
 
     @Override
@@ -85,70 +87,6 @@ public class CalculateActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         String problem = intent.getStringExtra(MainActivity.PROBLEM);
-
-//        problem = problem.replaceAll("\\s", "");
-//        String splitAddSubtract = "([0-9*/]+|([+-]))";
-//        Pattern p = Pattern.compile(splitAddSubtract);
-//        Matcher m = p.matcher(problem);
-//        List<String> problemList = new ArrayList<String>();
-//
-//        while (m.find()) {
-//            problemList.add(m.group(0));
-//        }
-//
-//        for(Integer i = 0; i < problemList.size(); i++) {
-//            List<String> equationMultiplyDivide = new ArrayList<String>();
-//            String equation = problemList.get(i);
-//
-//            if (equation.contains("*") || equation.contains("/")) {
-//                String splitMultiplyDivide = "(-?\\d+)|(\\D)";
-//                Pattern p2 = Pattern.compile(splitMultiplyDivide);
-//                Matcher m2 = p2.matcher(equation);
-//
-//                while (m2.find()) {
-//                    equationMultiplyDivide.add(m2.group(0));
-//                }
-//
-//                Integer intMultiplyDivide1 = null;
-//                Integer intMultiplyDivide2 = null;
-//                String resultMultiplyDivide = null;
-//
-//                while (equationMultiplyDivide.size() > 1) {
-//                    intMultiplyDivide1 = Integer.parseInt(equationMultiplyDivide.get(0));
-//                    intMultiplyDivide2 = Integer.parseInt(equationMultiplyDivide.get(2));
-//                    equationMultiplyDivide.remove(2);
-//                    equationMultiplyDivide.remove(0);
-//
-//                    if (equationMultiplyDivide.get(0).equals("*")) {
-//                        resultMultiplyDivide = Integer.toString(intMultiplyDivide1 * intMultiplyDivide2);
-//                    } else if (equationMultiplyDivide.get(0).equals("/")) {
-//                        resultMultiplyDivide = Integer.toString(intMultiplyDivide1 / intMultiplyDivide2);
-//                    }
-//                    equationMultiplyDivide.set(0, resultMultiplyDivide);
-//                }
-//
-//                problemList.set(i, resultMultiplyDivide);
-//            }
-//        }
-//
-//        Integer intAddSubtract1 = null;
-//        Integer intAddSubtract2 = null;
-//        String resultAddSubtract = null;
-//
-//        while (problemList.size() > 1) {
-//            intAddSubtract1 = Integer.parseInt(problemList.get(0));
-//            intAddSubtract2 = Integer.parseInt(problemList.get(2));
-//            problemList.remove(2);
-//            problemList.remove(0);
-//
-//            if (problemList.get(0).equals("+")) {
-//                resultAddSubtract = Integer.toString(intAddSubtract1 + intAddSubtract2);
-//            } else if (problemList.get(0).equals("-")) {
-//                resultAddSubtract = Integer.toString(intAddSubtract1 - intAddSubtract2);
-//            }
-//            problemList.set(0, resultAddSubtract);
-//        }
-//        String answer = problemList.get(0);
 
         TextView textView = findViewById(R.id.textView);
         textView.setText(calculateAnswer(problem));
