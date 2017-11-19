@@ -57,9 +57,6 @@ public class CalculateActivity extends AppCompatActivity {
             case "-":
                 result = Integer.toString(int1 - int2);
                 break;
-            default:
-                result = null;
-                break;
         }
         return result;
     }
